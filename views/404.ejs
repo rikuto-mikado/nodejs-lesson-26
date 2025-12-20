@@ -1,0 +1,10 @@
+<%# Include the common head section (DOCTYPE, html, head opening, meta tags, common CSS) %>
+<%# Use unescaped output to render HTML content from the included file %>
+<%- include('includes/head.ejs') %>
+    <%# Close the head tag here - allows adding page-specific CSS before closing %>
+</head>
+<body>
+    <%- include('includes/nav.ejs') %>
+    <%# Main content: Display 404 error message %>
+    <h1>Page Not Found!</h1>
+<%- include('includes/end.ejs') %>
