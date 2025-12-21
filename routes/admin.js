@@ -2,28 +2,16 @@ const path = require('path');
 
 const express = require('express');
 
-const rootDir = require('../util/path');
+// Import the products controller which handles the business logic for product-related operations
+const productsController = require('../controllers/products');
 
 const router = express.Router();
 
-const products = [];
+// GET /admin/add-product - Route to display the add product form
+router.get('/add-product', productsController.getAddProduct);
 
-router.get('/add-product', (req, res, next) => {
-  // Pass flags to the view: formCSS/productCSS conditionally load stylesheets, activeAddProduct highlights navigation
-  // This is a common pattern to control view-specific styling and UI state from the route handler
-  res.render('add-product', {
-    pageTitle: 'Add Product',
-    path: '/admin/add-product',
-    formCSS: true,
-    productCSS: true,
-    activeAddProduct: true 
-  });
-});
+// POST /admin/add-product - Route to handle form submission and create a new product
+router.post('/add-product', productsController.postAddProduct);
 
-router.post('/add-product', (req, res, next) => {
-  products.push({ title: req.body.title });
-  res.redirect('/');
-});
-
-exports.routes = router;
-exports.products = products;
+// Export the router to be mounted in the main app
+module.exports = router;
