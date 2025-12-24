@@ -1,5 +1,4 @@
-// Array to store all products in memory (temporary storage, will be replaced with database later)
-const products = [];
+const Product = require('../models/product');
 
 // Controller function to render the add product form page
 exports.getAddProduct = (req, res, next) => {
@@ -14,7 +13,15 @@ exports.getAddProduct = (req, res, next) => {
 
 // Controller function to handle product creation from form submission
 exports.postAddProduct = (req, res, next) => {
-    products.push({ title: req.body.title });
+    // Step 1: Create a new Product instance in memory with the title from the form
+    // 'new Product()' calls the constructor, setting this.title = req.body.title
+    const product = new Product(req.body.title);
+
+    // Step 2: Persist the product by calling its save() method
+    // save() pushes this product instance into the products array
+    // Separating creation and saving allows for validation or modification before saving
+    product.save();
+
     res.redirect('/');
 };
 
