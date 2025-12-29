@@ -27,13 +27,15 @@ exports.postAddProduct = (req, res, next) => {
 
 // Controller function to retrieve and display all products on the shop page
 exports.getProducts = (req, res, next) => {
-    res.render('shop', {
-        prods: products,
-        pageTitle: 'Shop',
-        path: '/',
-        hasProducts: products.length > 0,
-        activeShop: true,
-        productCSS: true,
-        layout: false
-  });
+    Product.fetchAll((products) => {
+        res.render('shop', {
+            prods: products,
+            pageTitle: 'Shop',
+            path: '/',
+            hasProducts: products.length > 0,
+            activeShop: true,
+            productCSS: true,
+            layout: false
+        });
+    });
 };

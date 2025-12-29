@@ -52,5 +52,78 @@ module.exports = class Product {
 
 ---
 
+### File System Operations - Asynchronous Callbacks
+
+#### Why Use Callbacks?
+
+Node.js file operations (`fs.readFile`, `fs.writeFile`) are **asynchronous** - they don't block code execution. Results are returned via **callbacks**.
+
+| Method | Purpose | When to Use |
+|--------|---------|-------------|
+| `fs.readFile(path, callback)` | Read file content | Load data before processing |
+| `fs.writeFile(path, data, callback)` | Write/overwrite file | Save data to disk |
+
+#### The Pattern:
+
+```javascript
+// 1. Read existing data
+fs.readFile(path, (err, fileContent) => {
+    let data = [];
+    if (!err) {
+        data = JSON.parse(fileContent);  // Parse JSON → Array
+    }
+
+    // 2. Modify data
+    data.push(newItem);
+
+    // 3. Write back to file
+    fs.writeFile(path, JSON.stringify(data), (err) => {
+        if (err) console.log(err);
+    });
+});
+```
+
+#### Why `static fetchAll(cb)` Uses a Callback:
+
+```javascript
+// WRONG - Can't return directly from async operation
+static fetchAll() {
+    fs.readFile(path, (err, content) => {
+        return JSON.parse(content);  // Returns to readFile callback, not fetchAll
+    });
+    // fetchAll returns undefined here
+}
+
+// CORRECT - Use callback to pass data when ready
+static fetchAll(cb) {
+    fs.readFile(path, (err, content) => {
+        cb(JSON.parse(content));  // ✓ Pass data to callback when ready
+    });
+}
+
+// Usage
+Product.fetchAll((products) => {
+    console.log(products);  // Data available here
+});
+```
+
+#### The Flow:
+
+```
+Controller calls fetchAll()
+    ↓
+fetchAll() starts reading file (async)
+    ↓
+File read completes → callback fires
+    ↓
+Parsed data passed to controller's callback
+    ↓
+Controller renders view with data
+```
+
+**Key Takeaway:** Asynchronous operations require callbacks because you can't `return` values that aren't ready yet. The callback pattern ensures data is only used after it's available.
+
+---
+
 ## Memo
 <!-- Summary to be filled in later (3 sentences) -->

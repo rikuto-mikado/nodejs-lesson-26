@@ -1,4 +1,6 @@
-const products = [];
+// File System module - used to save/load products to/from a JSON file
+const fs = require('fs');
+const path = require('path');
 
 // Product class exported as a module
 // Create instances using: new Product(title)
@@ -9,13 +11,40 @@ module.exports = class Product {
     }
 
     save() {
-        products.push(this);
+        // Build file path: /project-root/data/products.json
+        // (Same path used in both save() and fetchAll() to access the same file)
+        const p = path.join(
+            path.dirname(require.main.filename),
+            'data',
+            'products.json'
+        );
+        fs.readFile(p, (err, fileContent) => {
+            let products = [];
+            if (!err) {
+                products = JSON.parse(fileContent);
+            }
+            products.push(this);
+            fs.writeFile(p, JSON.stringify(products), (err) => {
+                console.log(err);
+            });
+        });
     }
 
-    // Static method - called on the class itself, not on instances
-    // Usage: Product.fetchAll() (NOT: product.fetchAll())
-    // Used for utility functions that don't require instance data
-    static fetchAll() {
-        return this.products;
+    // Static method to fetch all products from the JSON file
+    static fetchAll(cb) {
+        // Build file path: /project-root/data/products.json
+        // (Same path used in both save() and fetchAll() to access the same file)
+        const p = path.join(
+            path.dirname(require.main.filename),
+            'data',
+            'products.json'
+        );
+        fs.readFile(p, (err, fileContent) => {
+            if (err) {
+                cb([]);
+            } else {
+                cb(JSON.parse(fileContent));
+            }
+        });
     }
 }
