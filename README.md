@@ -1,7 +1,63 @@
 # Node.js Lesson 26
 
 ## What I Learned
-<!-- To be filled in later -->
+
+### MVC Architecture Pattern
+
+This project follows the **MVC (Model-View-Controller)** pattern to separate concerns and organize code.
+
+| Component | Responsibility | Location | Example |
+|-----------|---------------|----------|---------|
+| **Model** | Data structure and business logic | `models/` | `Product` class with `save()`, `fetchAll()` |
+| **View** | User interface (HTML templates) | `views/` | `shop.ejs`, `add-product.ejs` |
+| **Controller** | Handles requests, coordinates Model & View | `controllers/` | `getProducts()`, `postAddProduct()` |
+
+#### How They Work Together:
+
+```
+User Request (e.g., GET /)
+    ↓
+Route matches request → calls Controller
+    ↓
+Controller asks Model for data
+    ↓
+Model reads from file/database → returns data
+    ↓
+Controller passes data to View
+    ↓
+View renders HTML with data
+    ↓
+Response sent to User
+```
+
+#### Code Example:
+
+**Model** (`models/product.js`):
+```javascript
+class Product {
+    save() { /* Save to file */ }
+    static fetchAll(cb) { /* Read from file */ }
+}
+```
+
+**Controller** (`controllers/products.js`):
+```javascript
+exports.getProducts = (req, res, next) => {
+    Product.fetchAll((products) => {  // Get data from Model
+        res.render('shop', { prods: products });  // Pass to View
+    });
+};
+```
+
+**View** (`views/shop.ejs`):
+```html
+<% prods.forEach(product => { %>
+    <h1><%= product.title %></h1>
+<% }); %>
+```
+
+**Key Takeaway:**
+MVC separates **data** (Model), **presentation** (View), and **logic** (Controller), making code easier to maintain and test.
 
 ---
 
@@ -11,9 +67,9 @@
 
 | Pattern | Syntax | Valid? |
 |---------|--------|--------|
-| Constructor Function | `function Product(t) { this.title = t; }` | ✓ |
-| ES6 Class | `class Product { constructor(t) { this.title = t; } }` | ✓ |
-| **Mixed (WRONG)** | `function Product(t) { constructor(t) { this.title = t; } }` | ❌ |
+| Constructor Function | `function Product(t) { this.title = t; }` | Yes |
+| ES6 Class | `class Product { constructor(t) { this.title = t; } }` | Yes |
+| **Mixed (WRONG)** | `function Product(t) { constructor(t) { this.title = t; } }` | No |
 
 #### The Problem:
 ```javascript
@@ -48,7 +104,8 @@ module.exports = class Product {
 }
 ```
 
-**Key Takeaway:** The `constructor()` keyword only exists within class definitions. In constructor functions, the function body itself serves as the constructor logic.
+**Key Takeaway:**
+The `constructor()` keyword only exists within class definitions. In constructor functions, the function body itself serves as the constructor logic.
 
 ---
 
@@ -97,7 +154,7 @@ static fetchAll() {
 // CORRECT - Use callback to pass data when ready
 static fetchAll(cb) {
     fs.readFile(path, (err, content) => {
-        cb(JSON.parse(content));  // ✓ Pass data to callback when ready
+        cb(JSON.parse(content));  // Pass data to callback when ready
     });
 }
 
@@ -121,9 +178,11 @@ Parsed data passed to controller's callback
 Controller renders view with data
 ```
 
-**Key Takeaway:** Asynchronous operations require callbacks because you can't `return` values that aren't ready yet. The callback pattern ensures data is only used after it's available.
+**Key Takeaway:**
+Asynchronous operations require callbacks because you can't `return` values that aren't ready yet. The callback pattern ensures data is only used after it's available.
 
 ---
 
 ## Memo
-<!-- Summary to be filled in later (3 sentences) -->
+
+This lesson focused on implementing the **MVC (Model-View-Controller)** pattern to separate data logic, presentation, and request handling. I learned how to use **asynchronous file operations** (`fs.readFile`, `fs.writeFile`) with callbacks to persist data to JSON files instead of keeping it in memory. A key insight was understanding why `return` doesn't work with async operations - callbacks are required to handle data that isn't available immediately. I also clarified the difference between ES6 classes (which use the `constructor()` keyword) and constructor functions (where the function body itself serves as the constructor).
